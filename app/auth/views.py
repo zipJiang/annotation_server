@@ -1,8 +1,9 @@
 from flask import render_template, redirect, request, url_for, flash
-from .import auth
+from . import auth
+from .. import db
 from flask_login import login_user, logout_user, login_required
 from ..models import User
-from .forms import LoginForm
+from .forms import LoginForm, RegistrationForm
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -20,7 +21,7 @@ def login():
             return redirect(next)
         flash('Invalid username or password.')
 
-    return render_template('auth/login.html')
+    return render_template('auth/login.html', form=form)
 
 
 @auth.route('/logout')
@@ -29,3 +30,18 @@ def logout():
     logout_user()
     flash('You have been logged out.')
     return redirect(url_for('main.index'))
+
+
+@auth.route('/register')
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(email=form.email.data.lower(),
+                    username=form.username.data,
+                    password=form.password.data)
+        db.session.add(user)
+        db.session.commit()
+
+        return redirect(url_for('main.index'))
+
+    return render_template('auth/register.html', form=form)
