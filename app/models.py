@@ -30,7 +30,6 @@ class Progress(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     results = db.relationship('AnnotationResult', backref='progress',
                               lazy='dynamic')
-    current_row_id = db.Column(db.Integer, default=0)
 
 
 class AnnotationContent(db.Model):

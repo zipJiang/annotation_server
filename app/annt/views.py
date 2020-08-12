@@ -7,8 +7,10 @@ import random
 import json
 
 
-@annt.route('/task/<progress_id>', methods=['GET', 'POST'])
-def task(progress_id: int):
+@annt.route('/task/<progress_id>', methods=['GET'],
+            defaults={'working_row_id': None})
+@annt.route('/task/<progress_id>/<working_row_id>', methods=['GET', 'POST'])
+def task(progress_id: int, working_row_id: int):
     """This function run task of a specific id from the progress.
     (task id here is the synonym of progress id.)
     """
@@ -28,25 +30,38 @@ def task(progress_id: int):
             json_dict[key] = value
 
         # and now write info back
+
+        already_done = progress.results.filter_by(row_id=working_row_id).first()
+        if already_done is not None:
+            flash('This hit has been submitted before, the result is now updated.')
+            db.session.delete(already_done)
+
         annotation_result = AnnotationResult(result=json.dumps(json_dict),
-                                             row_id=progress.current_row_id)
+                                             row_id=working_row_id)
+
         progress.results.append(annotation_result)
         db.session.commit()
 
     # comparing finished items and all items
-    finished = [item.row_id for item in progress.results.all()]
-    all_ = [item.row_id for item in progress.file.annotation_contents.all()]
 
-    remaining = set(all_).difference(set(finished))
-    if remaining:
-        selected_row_id = random.choice(list(remaining))
-        selected_instance = progress.file.annotation_contents.filter_by(row_id=selected_row_id).first_or_404()
+    if working_row_id is None:
+        finished = [item.row_id for item in progress.results.all()]
+        all_ = [item.row_id for item in progress.file.annotation_contents.all()]
 
-        progress.current_row_id = selected_row_id
-        db.session.commit()
+        remaining = set(all_).difference(set(finished))
 
-        # now render the template with this selected instance.
+        if remaining:
+            selected_row_id = random.choice(list(remaining))
+            selected_instance = progress.file.annotation_contents.filter_by(row_id=selected_row_id).first()
+
+            db.session.commit()
+
+            # now render the template with this selected instance.
+            json_content = json.loads(selected_instance.content)
+            return render_template('annt/{}'.format(template_name), content=json_content)
+        else:
+            return render_template('finished_all.html', user=current_user)
+    else:
+        selected_instance = progress.file.annotation_contents.filter_by(row_id=working_row_id).first_or_404()
         json_content = json.loads(selected_instance.content)
         return render_template('annt/{}'.format(template_name), content=json_content)
-    else:
-        return render_template('finished_all.html', user=current_user)
