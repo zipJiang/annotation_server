@@ -14,10 +14,10 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is not None and user.verify_password(form.password.data):
-            login_user(user, form.remeber_me.data)
+            login_user(user, form.remember_me.data)
             next = request.args.get('next')
             if next is None or not next.startswith('/'):
-                next = url_for('main.index')
+                next = url_for('main.user', username=user.username)
             return redirect(next)
         flash('Invalid username or password.')
 
@@ -32,7 +32,7 @@ def logout():
     return redirect(url_for('main.index'))
 
 
-@auth.route('/register')
+@auth.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -42,6 +42,6 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.user', username=user.username))
 
     return render_template('auth/register.html', form=form)

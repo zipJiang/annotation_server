@@ -5,12 +5,14 @@ from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
+from flask_moment import Moment
 from flask_login import LoginManager
 from config import config
 
 
 bootstrap = Bootstrap()
 db = SQLAlchemy()
+moment = Moment()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 
@@ -24,6 +26,7 @@ def create_app(config_name: Text):
 
     bootstrap.init_app(app)
     db.init_app(app)
+    moment.init_app(app)
     login_manager.init_app(app)
 
     # attach routes and custom error page.
@@ -33,5 +36,8 @@ def create_app(config_name: Text):
 
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
+
+    from .annt import annt as annt_blueprint
+    app.register_blueprint(annt_blueprint, url_prefix='/annt/')
 
     return app

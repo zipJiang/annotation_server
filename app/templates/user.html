@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Annotation - {{ user.username }}{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <div class='profile-header'>
+        <h1>{{ user.username }}</h1>
+        <h5>{{ user.email }}</h5>
+    </div>
+</div>
+
+<hr/>
+<h3>Available Tasks</h3>
+
+{% for progress_instance in user.progresses %}
+<div class="card text-white bg-secondary mb-3" style="max-width: 18rem;">
+    <div class="card-body">
+        <h5 class="card-title">{{ progress_instance.file.taskname }}</h5>
+        <p class="card-text">{{ progress_instance.file.description }}</p>
+        <div class="progress">
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress_instance|get_percent }}" aria-valuenow={{ progress_instance|get_num_finished }} aria-valuemin="0" aria-valuemax={{ progress_instance.file.hit_num }}>{{ progress_instance|get_percent }}</div>
+        </div>
+        <br />
+        <a href="{{ url_for('annt.task', progress_id=progress_instance.id) }}">
+            <button type="button" class="btn btn-primary">Resume Annotation</button>
+        </a>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

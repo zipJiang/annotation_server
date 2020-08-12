@@ -4,6 +4,7 @@ functionality with password hashing.
 import unittest
 from app.models import User
 
+
 class UserModelTestCase(unittest.TestCase):
     """Test the user password functionality.
     """
