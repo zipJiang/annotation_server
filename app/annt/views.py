@@ -49,4 +49,4 @@ def task(progress_id: int):
         json_content = json.loads(selected_instance.content)
         return render_template('annt/{}'.format(template_name), content=json_content)
     else:
-        return render_template('annt/finished_all.html', user=current_user)
+        return render_template('finished_all.html', user=current_user)

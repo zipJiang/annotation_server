@@ -13,20 +13,24 @@
 <hr/>
 <h3>Available Tasks</h3>
 
-{% for progress_instance in user.progresses %}
-<div class="card text-white bg-secondary mb-3" style="max-width: 18rem;">
-    <div class="card-body">
-        <h5 class="card-title">{{ progress_instance.file.taskname }}</h5>
-        <p class="card-text">{{ progress_instance.file.description }}</p>
-        <div class="progress">
-            <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress_instance|get_percent }}" aria-valuenow={{ progress_instance|get_num_finished }} aria-valuemin="0" aria-valuemax={{ progress_instance.file.hit_num }}>{{ progress_instance|get_percent }}</div>
+<div class='row'>
+    {% for progress_instance in user.progresses %}
+    <div class="card text-white bg-secondary mb-3" style="max-width: 18rem; margin: 1rem">
+        <div class="card-body">
+            <h5 class="card-title">{{ progress_instance.file.taskname }}</h5>
+            <p class="card-text">{{ progress_instance.file.description }}</p>
+            <div class="progress">
+                <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress_instance|get_percent }}" aria-valuenow={{ progress_instance|get_num_finished }} aria-valuemin="0" aria-valuemax={{ progress_instance.file.hit_num }}>{{ progress_instance|get_percent }}</div>
+            </div>
+            <br />
+            <div class='button-holder' style='text-align: center'>
+                <a href="{{ url_for('annt.task', progress_id=progress_instance.id) }}">
+                    <button type="button" class="btn btn-primary">Resume Annotation</button>
+                </a>
+            </div>
         </div>
-        <br />
-        <a href="{{ url_for('annt.task', progress_id=progress_instance.id) }}">
-            <button type="button" class="btn btn-primary">Resume Annotation</button>
-        </a>
     </div>
+    {% endfor %}
 </div>
-{% endfor %}
 
 {% endblock %}

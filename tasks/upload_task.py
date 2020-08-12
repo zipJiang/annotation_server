@@ -64,13 +64,14 @@ if __name__ == '__main__':
                         required=True, type=str, help='data batch file.')
     PARSER.add_argument('--user_file', action='store', dest='user_file',
                         required=False, default=None, help='user file (each line a single user.)')
-    PARSER.add_argument('--template_file', action='store', dest='template_file',
-                        required=True, action='store', dest='template_file',
+    PARSER.add_argument('--template_file', action='store',
+                        dest='template_file', required=True,
                         help='Template file to be rendered (.html).')
     PARSER.add_argument('--desc', action='store', dest='desc',
                         required=True, type=str, help='Description of the task.')
     PARSER.add_argument('--title', action='store', dest='title',
-                        required=True, type=str, dest='title')
+                        required=True, type=str,
+                        help='titile to be assigned to the task.')
 
     PARSER.add_argument('--context', action='store', dest='context',
                         required=False, default='default', type=str,

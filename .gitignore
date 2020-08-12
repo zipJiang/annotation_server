@@ -2,3 +2,4 @@ __pycache__/
 flask_dev/
 data_batches/
 *.sqlite
+app/template/annt/

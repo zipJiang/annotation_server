@@ -1,0 +1,598 @@
+<!-- Bootstrap v3.0.3 -->
+{% extends "base.html" %}
+
+{% block title %} Web Annotation Service {% endblock %}
+
+{% block styles %}
+
+{{ super() }}
+<!-- close container -->
+<style type="text/css">fieldset {
+    padding: 10px;
+    background:#fbfbfb;
+    border-radius:5px;
+    margin-bottom:5px;
+}
+</style>
+<style type="text/css">
+	hr {
+	  display: block;
+	  margin-top: 0.5em;
+	  margin-bottom: 0.5em;
+	  margin-left: auto;
+	  margin-right: auto;
+	  border-style: inset;
+	  border-width: 1px;
+	}
+	table, th, td {
+		border-collapse: collapse;
+		border-spacing: 5px;
+		border-style: solid;
+		padding: 10px;
+		text-align:justify;
+		margin:auto; /* center the table */
+		font-size:13px;
+	}
+
+	.table_title {
+		text-align: center;
+	}
+
+	.break {
+		flex-basis: 100%;
+  		height: 0;
+	}
+
+	table.examples_instruction td {
+		border-color: #808080;
+	}
+
+	button {
+		/* technically this needs some compatibility, but it's not the end of the world if the submit button is square on some platforms and round on others */
+		border-radius: 3px;
+		padding: 5px;
+		border: none;
+	}
+
+	.squishyColumn {
+		width:300px;
+		max-width:500px;
+		min-width:300px;
+		word-wrap:break-word;
+	}
+	
+	.squishiestColumn {
+		width:200px;
+		max-width:300px;
+		min-width:200px;
+		word-wrap:break-word;
+	}
+
+	/* set font for entire page */
+	* {
+		font-family: Arial;
+	}
+
+	/* Adding more specification for the checkbox for word selection. */
+	ul.ks-cboxtags {
+	    list-style: none;
+	    padding: 2px;
+	}
+	ul.ks-cboxtags li{
+	  display: inline;
+	}
+	ul.ks-cboxtags li label{
+	    display: inline-block;
+	    background-color: rgba(255, 255, 255, .9);
+	    /* border: 2px solid rgba(139, 139, 139, .3); */
+	    /* color: #adadad; */
+	     border-radius: 10px;
+	    font-weight: normal !important;
+	    white-space: nowrap;
+	    margin: 3px 0px;
+	    -webkit-touch-callout: none;
+	    -webkit-user-select: none;
+	    -moz-user-select: none;
+	    -ms-user-select: none;
+	    user-select: none;
+	    -webkit-tap-highlight-color: transparent;
+	    transition: all .2s;
+	}
+
+	ul.ks-cboxtags li label {
+	    padding: 4px 1px;
+	    cursor: pointer;
+	}
+
+	/* Adding rendering for locked elements in the annotation*/
+	.locked {
+		background-color: #d3d3d3;
+	}
+
+	/*ul.ks-cboxtags li label::before {
+	    display: inline-block;
+	    font-style: normal;
+	    font-variant: normal;
+	    text-rendering: auto;
+	    -webkit-font-smoothing: antialiased;
+	    font-family: "Font Awesome 5 Free";
+	    font-weight: 900;
+	    font-size: 12px;
+	    padding: 2px 6px 2px 2px;
+	    content: "\f067";
+	    transition: transform .3s ease-in-out;
+	}
+	*/
+
+	/*ul.ks-cboxtags li input[type="checkbox"]:checked + label::before {
+	    content: "\f00c";
+	    transform: rotate(-360deg);
+	    transition: transform .3s ease-in-out;
+	}
+	*/
+
+	ul.ks-cboxtags li input[type="checkbox"]:checked + label {
+	    /* border: 2px solid #1bdbf8; */
+	    background-color: #12bbd4;
+		color: #fff;
+	    transition: all .2s;
+	}
+
+	ul.ks-cboxtags li input[type="checkbox"] {
+	  display: absolute;
+	}
+	ul.ks-cboxtags li input[type="checkbox"] {
+	  position: absolute;
+	  opacity: 0;
+	}
+	/* ul.ks-cboxtags li input[type="checkbox"]:focus + label {
+	  border: 2px solid #e9a1ff;
+	}*/
+
+	.slidecontainer {
+	  width: 100%;
+	}
+
+	.slider {
+	  -webkit-appearance: none;
+	  width: 100%;
+	  height: 25px;
+	  background: #d3d3d3;
+	  outline: none;
+	  opacity: 0.7;
+	  -webkit-transition: .2s;
+	  transition: opacity .2s;
+	}
+
+	.slider:hover {
+	  opacity: 1;
+	}
+
+	.slider::-webkit-slider-thumb {
+	  -webkit-appearance: none;
+	  appearance: none;
+	  width: 25px;
+	  height: 25px;
+	  background: #4CAF50;
+	  cursor: pointer;
+	}
+
+	.slider::-moz-range-thumb {
+	  width: 25px;
+	  height: 25px;
+	  background: #4CAF50;
+	  cursor: pointer;
+	}
+
+	input.locked::-webkit-slider-thumb {
+	  -webkit-appearance: none;
+	  appearance: none;
+	  width: 25px;
+	  height: 25px;
+	  background: #d3d3d3;
+	  cursor: pointer;
+	}
+
+	input.locked::-moz-range-thumb {
+	  width: 25px;
+	  height: 25px;
+	  background: #d3d3d3;
+	  cursor: pointer;
+	}
+
+	mark {
+		background: #33c9f2;
+	}
+
+	/* End of the modification for the style required for text selection. */
+</style>
+
+{% endblock %}
+
+{% block page_content %}
+
+<div class="row">
+<div class="col-xs-12 col-md-12"><!-- Instructions -->
+	<h2 align='center'>Estimating Degree of Stress</h2>
+<p><b>Instructions</b>: Thank you for
+participating in our annotation task. In this task, you will be asked
+to look at short segment of social media posts and decide to what degree the
+author of the post is expressing stress. Here are some guidelines to
+help you understand our intended definition of stress.</p>
+
+<ul>
+<li>
+<p>In order to
+	label a segment “stress”, the author should be <b>feeling stress</b>
+	(generally defined as some kind of pressure), and they should also
+	<b>feel negatively about it</b>. Sometimes we may be stressed about
+	an event but feel positively about it (e.g., a first date or job
+	interview may cause worry but ultimately be exciting); this is not
+        the kind of stress we are looking for.</p></li>
+<li><p>
+	All segments come from user-generated posts in some kind of support forums. <b style="color: red;">You’ll be asked to annotate the degree of stress the author expressed in a single segment over a 5 point scale ranging from “Not at All Stressed”, “Not Very Stressed”, “Somewhat Stressed”, “Moderately Stressed” to “Extremely Stressed”</b>.
+</p>
+</li>
+
+<li>
+<p>Try to
+	understand how the <b>author</b> is framing the event, <b>not how you
+	would feel in the same situation</b>. An author may be more or less
+	easily stressed than you are (e.g., perhaps the author has an
+	anxiety disorder that makes the event particularly stressful, or
+	does not place as much value on the event as you would and is not
+	very stressed).</p>
+</li>
+
+<li><p>Keep in mind that these are segments of larger posts; it is possible that the author is generally stressed about the situation they describe, but not expressing it explicitly in the segment you are given. In such cases, try to label the segment with less stress.
+</p></li>
+</ul>
+
+<p>
+<br/> 
+</p>
+<p><b>Reasoning</b></p>
+<p>
+Please also give some short explanations for your choices:</p>
+<ul>
+	<li/>
+<p>
+	You are <b style="color: red;">required to select the most important/salient words that contribute to how you label each segment by clicking on them.</b> (you may think about words whose removal would change your label). You may select up to 25 words for each segment. (Click the word again to deselect.)
+</p>
+	<li/>
+<p>
+	If you cannot understand the segment, you may check the box for <q>can't tell</q> indicate that in the reasoning box. If you do this the corresponding row will be automatically disabled.</p>
+</ul>
+<p><br/>
+
+</p>
+<p>You may wish to look
+through the following examples.</p>
+
+<table width="80%" cellpadding="4" cellspacing="0" class="examples_instruction">
+	<col width="85*">
+	<col width="85*">
+	<col width="85*">
+	<tr valign="top">
+		<td width="33%" class="table_title">
+			<p><b>Text</b></p>
+		</td>
+		<td width="33%" class="table_title">
+			<p><b>Label</b></p>
+		</td>
+		<td width="33%" class="table_title">
+			<p><b>Reasoning</b></p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="33%">
+			<p>Kick a man while he's donw you <mark class="eselected">sick</mark> <mark class="eselected">sick</mark> <mark class="eselected">fuck</mark>. I'm just trying to get advice and you delete part of my post. <mark>FUCK</mark> <mark>YOU</mark>. <mark>BURN</mark> <mark>IN</mark> <mark>HELL</mark>. People like you are why I <mark>hate</mark> this world.</p>
+		</td>
+		<td width="33%">
+			<div id='example_slider_1'>
+					<p style="text-align: center">[[label]]</p>
+					<input type="range" v-bind:min="minVal" v-bind:max="maxVal" v-model="currentVal" class="slider" id="sliderId" name="inputName" v-bind:disabled="blk == 1">
+					<p style="float: left">-</p><p style="float: right">+</p>
+			</div>
+		</td>
+		<td width="33%">
+			<p>The author is very clearly describing a negative emotional state, an angry reaction to an interaction on social media. The author also seems to be in a general state of despair, expressing negative emotions towards the world.</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="33%">
+			<p>I'm taking care of her but <mark>I</mark> <mark>have</mark> <mark>no</mark> <mark>idea</mark> <mark>what</mark> <mark>to</mark> <mark>do</mark> <mark>with</mark> <mark>myself</mark>. **TL;DR: My wife told her co-worker that she and I were in an open relationship and started hooking up with him. She said it's bcause I have too high a libido, because our relationship lost it's newness, and becaues I don't do a fair share of housework. <mark>I</mark> <mark>'m</mark> <mark>not</mark> <mark>sure</mark> <mark>if</mark> <mark>we</mark> <mark>can</mark> <mark>work</mark> <mark>it</mark> <mark>out</mark> or if I should just leave.</p>
+		</td>
+		<td width="33%">
+			<div id='example_slider_2'>
+					<p style="text-align: center">[[label]]</p>
+					<input type="range" v-bind:min="minVal" v-bind:max="maxVal" v-model="currentVal" class="slider" id="sliderId" name="inputName" v-bind:disabled='blk'>
+					<p style="float: left">-</p><p style="float: right">+</p>
+			</div>
+		</td>
+		<td width="33%">
+			<p>The author is describing what appears to be a stressful situation (infidelity) but does not use many explicit emotional indicators of positive or negative emotion. However, the post clearly shows that the author is not sure about what to do next and is caught up by inability to cope with current situation.</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="33%">
+			<p>He doesn't have to spend a load of money on things I like! He can use it to spend on himself. I don't understand why he feels that just because we're in a relationship that he has to "spoil" me. I enjoy being spoiled but only when I'm the one spoiling myself, <mark>haha</mark>. TL;Dr: My boyfriedn doesn't like that I don't want him to do anything for me</p>
+		</td>
+		<td width="33%">
+			<div id='example_slider_3'>
+					<p style="text-align: center">[[label]]</p>
+					<input type="range" v-bind:min="minVal" v-bind:max="maxVal" v-model="currentVal" class="slider" id="sliderId" name="inputName" v-bind:disabled='blk'>
+					<p style="float: left">-</p><p style="float: right">+</p>
+			</div>
+		</td>
+		<td width="33%">
+			<p>The author is describing what appears to be a minor disagreement with a significant other. They use exclamation points and hedging (e.g. haha) to soften the appearance of disagreement. There seems to be evidence that suggests the author is in fact feeling funny instead of stressed.</p>
+		</td>
+	</tr>
+</table>
+<br/>
+<br/>
+</div> <!-- COL -->
+</div> <!-- ROW -->
+<!-- End Instructions -->
+<!-- Content Body -->
+<hr />
+<br />
+<section>
+<h5 align="center">Begin Annotations</h5>
+<form method='post'>
+<table id="questions_table" width="80%">
+	<tbody>
+		<tr>
+			<th class="squishyColumn table_title">Sentence</th>
+			<th class="table_title">Label</th>
+			<th class="table_title">Reasoning</th>
+		</tr>
+		<tr class="randomordercontent group1" v-bind:class="{locked:isLocked}" id="grouping_1">
+			<td class="squishyColumn" v-bind:class="{locked:isLocked}">
+                            <div class="sentence" v-bind:id="sentenceId">{{ content.sentence1|safe }}</div>
+			</td>
+			<td style="width: 33%" v-bind:class="{locked:isLocked}">
+				<div v-bind:id='sliderId'>
+					<p style="text-align: center" v-bind:style="{color: activateColor}"><b>[[label]]</b></p>
+					<input type="range" v-bind:min="minVal" v-bind:max="maxVal" v-model="currentVal" class="slider" v-bind:class="{locked:isLocked}" v-bind:id="sliderId" v-bind:name="inputName" v-bind:disabled="blk">
+					<p style="float: left">-</p><p style="float: right">+</p>
+				</div>
+			</td>
+			<td style="width: 33%" v-bind:class="{locked:isLocked}">
+				<textarea cols='30' rows='5' v-bind:id="reasonId" v-bind:name="reasonId" v-bind:placeholder="placeholder" v-bind:style="{display: isShown}"></textarea><div class="break"></div>
+				<input type="checkbox" v-model="cantell" v-bind:name="cbId" value="1" v-bind:id="cbId"><label v-bind:for="cbId">&nbsp;I can't tell</label></td>
+		</tr>
+
+		<tr class="randomordercontent group1" v-bind:class="{locked:isLocked}" id="grouping_2">
+			<td class="squishyColumn" v-bind:class="{locked:isLocked}">
+                            <div class="sentence" v-bind:id="sentenceId">{{ content.sentence2|safe }}</div>
+			</td>
+			<td style="width: 33%" v-bind:class="{locked:isLocked}">
+				<div v-bind:id='sliderId'>
+					<p style="text-align: center" v-bind:style="{color: activateColor}"><b>[[label]]</b></p>
+					<input type="range" v-bind:min="minVal" v-bind:max="maxVal" v-model="currentVal" class="slider" v-bind:class="{locked:isLocked}" v-bind:id="sliderId" v-bind:name="inputName" v-bind:disabled="blk">
+					<p style="float: left">-</p><p style="float: right">+</p>
+				</div>
+			</td>
+			<td style="width: 33%" v-bind:class="{locked:isLocked}">
+				<textarea cols='30' rows='5' v-bind:id="reasonId" v-bind:name="reasonId" v-bind:placeholder="placeholder" 
+				v-bind:style="{display: isShown}"></textarea><div class="break"></div>
+				<input type="checkbox" v-model="cantell" v-bind:name="cbId" value="1" v-bind:id="cbId"><label v-bind:for="cbId">&nbsp;I can't tell</label></td>
+		</tr>
+
+		<tr class="randomordercontent group1" v-bind:class="{locked:isLocked}" id="grouping_3">
+			<td class="squishyColumn" v-bind:class="{locked:isLocked}">
+                            <div class="sentence" v-bind:id="sentenceId">{{ content.sentence3|safe }}</div>
+			</td>
+			<td style="width: 33%" v-bind:class="{locked:isLocked}">
+				<div v-bind:id='sliderId'>
+					<p style="text-align: center" v-bind:style="{color: activateColor}"><b>[[label]]</b></p>
+					<input type="range" v-bind:min="minVal" v-bind:max="maxVal" v-model="currentVal" class="slider" v-bind:class="{locked:isLocked}" v-bind:id="sliderId" v-bind:name="inputName" v-bind:disabled="blk">
+					<p style="float: left">-</p><p style="float: right">+</p>
+				</div>
+			</td>
+			<td style="width: 33%" v-bind:class="{locked:isLocked}">
+				<textarea cols='30' rows='5' v-bind:id="reasonId" v-bind:name="reasonId" v-bind:placeholder="placeholder" v-bind:style="{display: isShown}"></textarea><div class="break"></div>
+				<input type="checkbox" v-model="cantell" v-bind:name="cbId" value="1" v-bind:id="cbId"><label v-bind:for="cbId">&nbsp;I can't tell</label></td>
+		</tr>
+
+		<tr class="randomordercontent group1" v-bind:class="{locked:isLocked}" id="grouping_4">
+			<td class="squishyColumn" v-bind:class="{locked:isLocked}">
+                            <div class="sentence" v-bind:id="sentenceId"> {{ content.sentence4|safe }}</div>
+			</td>
+			<td style="width: 33%" v-bind:class="{locked:isLocked}">
+				<div v-bind:id='sliderId'>
+					<p style="text-align: center" v-bind:style="{color: activateColor}"><b>[[label]]</b></p>
+					<input type="range" v-bind:min="minVal" v-bind:max="maxVal" v-model="currentVal" class="slider" v-bind:class="{locked:isLocked}" v-bind:id="sliderId" v-bind:name="inputName" v-bind:disabled="blk">
+					<p style="float: left">-</p><p style="float: right">+</p>
+				</div>
+			</td>
+			<td style="width: 33%" v-bind:class="{locked:isLocked}">
+				<textarea cols='30' rows='5' v-bind:id="reasonId" v-bind:name="reasonId" v-bind:placeholder="placeholder" v-bind:style="{display: isShown}"></textarea><div class="break"></div>
+				<input type="checkbox" v-model="cantell" v-bind:name="cbId" value="1" v-bind:id="cbId"><label v-bind:for="cbId">&nbsp;I can't tell</label></td>
+		</tr>
+
+		<tr class="randomordercontent group1" v-bind:class="{locked:isLocked}" id="grouping_5">
+			<td class="squishyColumn" v-bind:class="{locked:isLocked}">
+                            <div class="sentence" v-bind:id="sentenceId">{{ content.sentence5|safe }}</div>
+			</td>
+			<td style="width: 33%" v-bind:class="{locked:isLocked}">
+				<div v-bind:id='sliderId'>
+					<p style="text-align: center" v-bind:style="{color: activateColor}"><b>[[label]]</b></p>
+					<input type="range" v-bind:min="minVal" v-bind:max="maxVal" v-model="currentVal" class="slider" v-bind:id="sliderId" v-bind:class="{locked:isLocked}" v-bind:name="inputName" v-bind:disabled="blk">
+					<p style="float: left">-</p><p style="float: right">+</p>
+				</div>
+			</td>
+			<td style="width: 33%" v-bind:class="{locked:isLocked}">
+				<textarea cols='30' rows='5' v-bind:id="reasonId" v-bind:name="reasonId" v-bind:placeholder="placeholder" v-bind:style="{display: isShown}"></textarea><div class="break"></div>
+				<input type="checkbox" v-model="cantell" v-bind:name="cbId" value="1" v-bind:id="cbId"><label v-bind:for="cbId">&nbsp;I can't tell</label></td>
+		</tr>
+
+	</tbody>
+</table>
+<div style='text-align: center'>
+    <button type='submit' class='btn btn-primary' id='submitButton'>Submit</button>
+</div>
+</form>
+
+</section>
+<!-- End Content Body --></div>
+
+
+{% block script %}
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+	function to_label() {
+		var label_list = ['Not at all Stressed', 'Not very Stressed', 'Somewhat Stressed', 
+			'Moderately Stressed', 'Extremely Stressed'];
+		return label_list[this.currentVal];
+	};
+	var data_exp_1 = {
+			sliderId: 'exp_1',
+			minVal: 0,
+			maxVal: 4,
+			currentVal: 4,
+			inputName: "exp_1",
+			blk: true,
+		};
+	var app_exp_1 = new Vue({
+		el: '#example_slider_1',
+		data: data_exp_1,
+		computed: {
+			label: to_label
+		},
+                delimiters: ['[[', ']]']
+	});
+
+	var data_exp_2 = {
+			sliderId: 'exp_2',
+			minVal: 0,
+			maxVal: 4,
+			currentVal: 2,
+			inputName: "exp_2",
+			blk: true,
+		};
+
+	var app_exp_2 = new Vue({
+		el: '#example_slider_2',
+		data: data_exp_2,
+		computed: {
+			label: to_label
+		},
+                delimiters: ['[[', ']]']
+	});
+
+	var data_exp_3 = {
+			sliderId: 'exp_3',
+			minVal: 0,
+			maxVal: 4,
+			currentVal: 0,
+			inputName: "exp_3",
+			blk: true,
+		};
+
+	var app_exp_3 = new Vue({
+		el: '#example_slider_3',
+		data: data_exp_3,
+		computed: {
+			label: to_label
+		},
+                delimiters: ['[[', ']]']
+	});
+
+	// We are employing a brand new vue object
+	data_list = [];
+	vue_list = [];
+
+	for (var i = 1; i != 6; ++i) {
+		data_list.push({
+			sentenceId: "sentence_" + i,
+			sliderId: "input_" + i,
+			reasonId: "reason_" + i,
+			cbId: "checkbox_" + i,
+			minVal: 0,
+			maxVal: 4,
+			currentVal: 0,
+			inputName: "input_" + i,
+			cantell: false,
+			colorList: ["#2fa8e0", "#d19494", "#e67a5c", "#d65858", "#cf0000", "#d3d3d3"]
+		});
+	}
+
+	for (var i = 1; i != 6; ++i) {
+		vue_list.push(new Vue({
+			el: "#grouping_" + i,
+			data: data_list[i - 1],
+			computed: {
+				label: to_label,
+				isLocked: function () {
+					return this.cantell;
+				},
+				blk: function() {
+					return this.cantell;
+				},
+				activateColor: function() {
+					if (this.cantell)
+						return this.colorList[5];
+					return this.colorList[this.currentVal];
+				},
+				placeholder: function() {
+					if (this.cantell)
+						return "Reasonings here....";
+					else
+						return "";
+				},
+				isShown: function() {
+					if (this.cantell)
+						return "block";
+					else
+						return "none";
+				}
+			},
+                        delimiters: ['[[', ']]']
+		}));
+	}
+
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+	$('document').ready(function () {
+		$('input[type=checkbox]').on('change', function (e) {
+			for (var i = 1; i != 6; ++i) {
+			    if ($('input[name=sent-' + i + '][type=checkbox]:checked').length > 25) {
+			        $(this).prop('checked', false);
+			        alert("For each single sentence you are only allowed to choose 25 candidate tokens.");
+			    }
+			}
+		});
+		$('#submitButton').click(function() {
+			for (var i = 1; i != 6; ++i) {
+			    if ($('input[name=sent-' + i + '][type=checkbox]:checked').length == 0) {
+			    	if (data_list[i - 1].cantell){
+			    		continue;
+			    	}
+			    	alert('Please select the most important/salient words that contribute to how you label each segment!');
+			    	return false;			    
+			    }
+			}
+			return true;
+		});
+});
+</script>
+{% endblock %}
+
+{% endblock %}
+<!-- <script src="//uniqueturker.myleott.com/lib.js" type="text/javascript"></script> -->
+<!-- <script type="text/javascript">
+(function(){
+    var ut_id = "8026c5eda01e5e142d75c17d79e89953";
+    if (UTWorkerLimitReached(ut_id)) {
+        document.getElementById('mturk_form').style.display = 'none';
+        document.getElementsByTagName('body')[0].innerHTML = "You have already completed the maximum number of HITs allowed by this requester. Please click 'Return HIT' to avoid any impact on your approval rating.";
+    }
+})();
+</script> -->
+
