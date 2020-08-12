@@ -1,6 +1,6 @@
-####[Aug/1/2020,22:04,EDT]
+#### [Aug/1/2020,22:04,EDT]
 
-######TODOS:
+###### TODOS:
 
 1. Adding Role permissions
 2. Make the templates conforming with Bootstrap4 [done]
@@ -9,9 +9,9 @@
 5. [optional] Adding the current working status for the annotation (consider integration methods) [done]
 
 
-####[Aug/11/2020, 23:59, EDT]
+#### [Aug/11/2020, 23:59, EDT]
 
-######TODOS:
+###### TODOS:
 
 1. Generalize the dataset processing scripts (Adding new tasks) [done]
 2. Generalize result processing scripts (Retrieving results).
